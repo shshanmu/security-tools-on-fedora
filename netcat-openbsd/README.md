@@ -13,10 +13,9 @@ Fedora and Kali handle `netcat` differently. This setup ensures that when you ru
 2. Make it executable:
    ```bash
    chmod +x setup-nc.sh
-   ./setup-nc.sh
 3. Run the script:
-   ```bash
-   bash setup-nc.sh
+   ```bash   
+   ./setup-nc.sh
 4. Reload your shell configuration:
    ```bash
    source ~/.bashrc
@@ -34,13 +33,6 @@ The script creates two aliases that use the --network host flag, allowing the co
    # Listen on a port
    nc-bsd -l -p 8080
    ```
-
-## Features
-- **Engine Agnostic:** Automatically detects and uses podman or docker.
-- **SELinux Aware:** On Fedora/RHEL systems, the script detects if SELinux is Enforcing and automatically appends the :Z flag to volume mounts to prevent "Permission Denied" errors.
-- **Volume Mounting:** Your current working directory is mapped to /data inside the container.
-- **User Mapping::wq** Uses --user $(id -u):$(id -g) so that files received or modified by netcat are owned by your host user, not root.
-
 ## File Transfers & Volume Mounting
 The aliases are configured to mount your current working directory ($(pwd)) to /data inside the container. This allows you to send or receive files directly.
 
@@ -53,6 +45,12 @@ The aliases are configured to mount your current working directory ($(pwd)) to /
   nc-bsd -l -p 1234 > incoming_data.txt
   ```
 Note: Because the container runs as root by default, files redirected into a file via the shell (like the example above) will be owned by your user, but files written directly by the container process to /data will be owned by root.
+
+## Features
+- **Engine Agnostic:** Automatically detects and uses podman or docker.
+- **SELinux Aware:** On Fedora/RHEL systems, the script detects if SELinux is Enforcing and automatically appends the :Z flag to volume mounts to prevent "Permission Denied" errors.
+- **Volume Mounting:** Your current working directory is mapped to /data inside the container.
+- **User Mapping::wq** Uses --user $(id -u):$(id -g) so that files received or modified by netcat are owned by your host user, not root.
 
 ## How It Works
 - Base Image: kalilinux/kali-rolling
