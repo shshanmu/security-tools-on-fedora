@@ -55,4 +55,4 @@ Note: Because the container runs as root by default, files redirected into a fil
 - Storage: Uses -v "$(pwd):/data" to bridge your current directory into the container environment.
 
 ## License
-You can find the License file in the LICENSES foolder in the repo.
+You can find the License file in the LICENSES folder in the repo.
