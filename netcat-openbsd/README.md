@@ -34,7 +34,7 @@ The script creates two aliases that use the --network host flag, allowing the co
    # Listen on a port
    nc-bsd -l -p 8080
 
-##File Transfers & Volume Mounting
+## File Transfers & Volume Mounting
 The aliases are configured to mount your current working directory ($(pwd)) to /data inside the container. This allows you to send or receive files directly.
 
 **Example: Sending a file**
