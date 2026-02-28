@@ -45,6 +45,8 @@ SEC_FLAGS="--security-opt label=type:container_runtime_t"
 DIRB_BLOCK="
 # --- Web Discovery Start ---
 alias dirb-bsd='$BASE_CMD $IMAGE_NAME dirb'
+alias dirb-gendict-bsd='$BASE_CMD $IMAGE_NAME dirb-gendict'
+alias dirb-html2dic-bsd='$BASE_CMD $IMAGE_NAME html2dic'
 alias dirbuster-bsd='xhost +local:\$(whoami) > /dev/null && $BASE_CMD $SEC_FLAGS $GUI_FLAGS $IMAGE_NAME dirbuster'
 # --- Web Discovery End ---
 "
