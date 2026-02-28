@@ -16,12 +16,12 @@ This project provides an automated script to build a [Kali Linux](https://www.ka
 4. Reload your shell configuration:
    ```bash
    source ~/.bashrc
-   
+   ```
 ## Usage
 Run the alias to start an interactive PowerShell session:
    ```bash
    powersploit-bsd
-   ```
+   
 ## Accessing PowerSploit Modules
    ```bash
    # Example: Importing PowerView for Reconnaissance
@@ -29,7 +29,6 @@ Run the alias to start an interactive PowerShell session:
 
    # Example: Using Get-NetDomain
    Get-NetDomain
-
    ```
 ## Features
 - **Engine Agnostic:** Automatically detects and uses podman or docker.
