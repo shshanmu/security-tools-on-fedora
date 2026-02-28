@@ -33,6 +33,7 @@ The script creates two aliases that use the --network host flag, allowing the co
    
    # Listen on a port
    nc-bsd -l -p 8080
+   ```
 
 ## File Transfers & Volume Mounting
 The aliases are configured to mount your current working directory ($(pwd)) to /data inside the container. This allows you to send or receive files directly.
@@ -40,18 +41,18 @@ The aliases are configured to mount your current working directory ($(pwd)) to /
 **Example: Sending a file**
    ```bash
    nc-bsd 192.168.1.10 1234 < my_local_file.txt
-
+   ``` 
 **Example: Receiving a file**
   ```bash
   nc-bsd -l -p 1234 > incoming_data.txt
-
+  ```
 Note: Because the container runs as root by default, files redirected into a file via the shell (like the example above) will be owned by your user, but files written directly by the container process to /data will be owned by root.
 
-##How It Works
+## How It Works
 - Base Image: kalilinux/kali-rolling
 - Binary: Explicitly targets /usr/bin/nc.openbsd.
 - Networking: Uses --network host so the containerized tool behaves as if it were installed natively on your Fedora host.
 - Storage: Uses -v "$(pwd):/data" to bridge your current directory into the container environment.
 
-##License
+## License
 You can find the License file in the LICENSES foolder in the repo.
