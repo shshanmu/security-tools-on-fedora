@@ -35,6 +35,12 @@ The script creates two aliases that use the --network host flag, allowing the co
    nc-bsd -l -p 8080
    ```
 
+## Features
+- **Engine Agnostic:** Automatically detects and uses podman or docker.
+- **SELinux Aware:** On Fedora/RHEL systems, the script detects if SELinux is Enforcing and automatically appends the :Z flag to volume mounts to prevent "Permission Denied" errors.
+- **Volume Mounting:** Your current working directory is mapped to /data inside the container.
+- **User Mapping::wq** Uses --user $(id -u):$(id -g) so that files received or modified by netcat are owned by your host user, not root.
+
 ## File Transfers & Volume Mounting
 The aliases are configured to mount your current working directory ($(pwd)) to /data inside the container. This allows you to send or receive files directly.
 
