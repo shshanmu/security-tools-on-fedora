@@ -21,7 +21,7 @@ This project provides an automated script to build a [Kali Linux](https://www.ka
 Run the alias to start an interactive PowerShell session:
    ```bash
    powersploit-bsd
-   
+   ```
 ## Accessing PowerSploit Modules
    ```bash
    # Example: Importing PowerView for Reconnaissance
