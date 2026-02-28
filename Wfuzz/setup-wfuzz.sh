@@ -25,6 +25,7 @@ RUN apt-get update && \\
     apt-get install -y \\
     wfuzz \\
     wordlists \\
+    seclists \\
     python3-setuptools \\
     python3-pycurl \\
     libcurl4-openssl-dev \\
