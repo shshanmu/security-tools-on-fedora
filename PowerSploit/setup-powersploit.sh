@@ -1,70 +1,40 @@
-i#!/bin/bash
+#!/bin/bash
 
-# 1. Configuration
 IMAGE_NAME="kali-powersploit"
 DOCKERFILE_NAME="Dockerfile.powersploit"
 
-echo "🚀 Starting setup for PowerSploit (Kali-based)..."
+# 1. Engine & SELinux Check
+if command -v podman >/dev/null 2>&1; then ENGINE="podman"; else ENGINE="docker"; fi
+SELINUX_FLAG=""; if [ "$(getenforce 2>/dev/null)" = "Enforcing" ]; then SELINUX_FLAG=":Z"; fi
 
-# 2. Container Engine Check
-if command -v podman >/dev/null 2>&1; then
-    CONTAINER_ENGINE="podman"
-elif command -v docker >/dev/null 2>&1; then
-    CONTAINER_ENGINE="docker"
-else
-    echo "❌ Error: Neither Podman nor Docker found."
-    exit 1
-fi
-
-# 3. SELinux Check for Fedora
-SELINUX_FLAG=""
-if command -v getenforce >/dev/null 2>&1; then
-    if [ "$(getenforce)" = "Enforcing" ]; then
-        SELINUX_FLAG=":Z"
-    fi
-fi
-
-# 4. Generate Dockerfile
-# Installs powershell and powersploit from Kali repos
+# 2. Build Dockerfile
 cat <<EOF > $DOCKERFILE_NAME
 FROM kalilinux/kali-rolling
-RUN apt-get update && \\
-    apt-get install -y powershell powersploit && \\
-    apt-get clean && \\
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y powershell powersploit && apt-get clean && rm -rf /var/lib/apt/lists/*
+ENV HOME=/tmp
 WORKDIR /data
-# PowerSploit scripts are located in /usr/share/powersploit/
-ENTRYPOINT ["pwsh"]
+
+# Loader script that sources everything
+RUN echo '\$ps = "/usr/share/windows-resources/powersploit"' > /load_modules.ps1 && \\
+    echo 'Write-Host "🔍 Force-Loading Modules..." -ForegroundColor Yellow' >> /load_modules.ps1 && \\
+    echo '. "\$ps/Recon/PowerView.ps1"' >> /load_modules.ps1 && \\
+    echo '. "\$ps/Privesc/PowerUp.ps1"' >> /load_modules.ps1 && \\
+    echo '. "\$ps/Exfiltration/Invoke-Mimikatz.ps1"' >> /load_modules.ps1 && \\
+    echo 'Write-Host "✅ PowerView, PowerUp, & Mimikatz Loaded!" -ForegroundColor Green' >> /load_modules.ps1
+
+# FIX: Start pwsh and DOT-SOURCE the loader into the primary session scope
+ENTRYPOINT ["pwsh", "-NoLogo", "-NoExit", "-Command", ". /load_modules.ps1"]
 EOF
 
-# 5. Build the Image
-echo "📦 Building image: $IMAGE_NAME using $CONTAINER_ENGINE..."
-if $CONTAINER_ENGINE build -t $IMAGE_NAME -f $DOCKERFILE_NAME .; then
-    echo "✅ Image built successfully."
-else
-    echo "❌ Build failed."
-    exit 1
-fi
+# 3. Build and Alias
+$ENGINE build -t $IMAGE_NAME -f $DOCKERFILE_NAME .
+ALIAS_LINE="alias powersploit-bsd='$ENGINE run --rm -it --network host -v \"\$(pwd):/data$SELINUX_FLAG\" $IMAGE_NAME'"
 
-# 6. Define Alias
-# Automatically mounts current directory and starts PowerShell
-ALIAS_CMD="$CONTAINER_ENGINE run --rm -it --network host -v \"\$(pwd):/data$SELINUX_FLAG\" --user \$(id -u):\$(id -g) $IMAGE_NAME"
-ALIAS_LINE="alias powersploit-bsd='$ALIAS_CMD'"
-
-# 7. Install Alias
 if ! grep -q "$IMAGE_NAME" ~/.bashrc; then
-    echo "" >> ~/.bashrc
-    echo "# PowerSploit Kali Container" >> ~/.bashrc
     echo "$ALIAS_LINE" >> ~/.bashrc
-    echo "✅ Alias 'powersploit-bsd' added to ~/.bashrc."
-else
-    echo "⚠️  Alias already exists."
+    echo "✅ Alias 'powersploit-bsd' added."
 fi
 
-# 8. Cleanup
 rm $DOCKERFILE_NAME
-echo "-------------------------------------------------------"
-echo "🎉 Setup Complete! Run 'source ~/.bashrc' to activate."
-echo "👉 Usage: powersploit-bsd"
-echo "👉 Inside pwsh, find modules at: /usr/share/powersploit/"
-echo "-------------------------------------------------------"
+echo "🚀 Run: source ~/.bashrc && powersploit-bsd"
+

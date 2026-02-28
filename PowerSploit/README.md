@@ -41,6 +41,45 @@ Run the alias to start an interactive PowerShell session:
 - Packages: Installs powershell and powersploit via apt.
 - Network: Uses --network host to allow network discovery from within the PowerShell session.
 
+## Troubleshooting
+If you encounter issues while running the PowerSploit or Netcat containers, refer to the solutions below.
+
+1. "Command Not Recognized" (e.g., Get-NetDomain)
+If you enter the container but cannot run PowerSploit commands:
+
+    - Check the Loader: Ensure you saw the green ✅ PowerSploit Core Loaded! message upon entry. If not, the profile may have failed.
+    - Manual Force-Load: You can manually dot-source the scripts within the session:
+    ```powershell
+    . /usr/share/windows-resources/powersploit/Recon/PowerView.ps1
+    ```
+    - Verify Files: Ensure the files exist in the Kali image:
+    ```powershell
+    Test-Path /usr/share/windows-resources/powersploit/Recon/PowerView.ps1
+    ```
+2. "Operation Not Supported on This Platform"
+You will see red error text during the loading process (especially for PowerUp or Mimikatz).
+
+    Cause: These scripts attempt to check Windows-specific APIs (WMI, Registry, Access Tokens) that do not exist on Linux.
+    Solution: Ignore these errors. The functions (like Get-NetDomain) will still load into memory. They are intended for use against remote Windows targets, not the local container environment.
+
+3. Permission Denied / History File Errors
+If you see errors regarding ConsoleHost_history.txt or access to /data/.local:
+
+    SELinux: Ensure you ran the setup script on Fedora with SELinux enabled; it adds the :Z flag to the volume mount.
+    Home Directory: The script sets ENV HOME=/tmp inside the Dockerfile to prevent PowerShell from trying to write config files to your host's current directory. If you manually modified the alias, ensure this environment variable is set.
+
+4. Files Created by Container are Owned by Root
+If you save a scan result and cannot delete it from your Fedora host:
+
+    Solution: The alias includes --user $(id -u):$(id -g). If you removed this, the container defaults to the root user. You can reclaim ownership on your host with:
+   ```bash
+   sudo chown -R $USER:$USER .
+   ```
+5. Network Connectivity Issues
+If nc-bsd cannot see local services or powersploit-bsd cannot reach a DC:
+
+    Solution: Ensure the alias includes --network host. This allows the container to share the Fedora host's IP and network interfaces directly.
+
 ## License
 This container includes PowerSploit, which is licensed under the **BSD 3-Clause** License.
 The Dockerfile and build scripts are licensed under the **MIT License**:
