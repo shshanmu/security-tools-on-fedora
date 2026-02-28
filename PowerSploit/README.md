@@ -80,6 +80,22 @@ If nc-bsd cannot see local services or powersploit-bsd cannot reach a DC:
 
     Solution: Ensure the alias includes --network host. This allows the container to share the Fedora host's IP and network interfaces directly.
 
+## Maintenance & Uninstallation
+Each setup script (setup-powersploit.sh) now includes a built-in uninstaller to keep your host environment clean.
+1. Uninstalling a Toolbox
+To remove a specific toolbox, its associated container image, and its aliases from your ~/.bashrc, run the original setup script with the --uninstall flag:
+  ```bash
+  bash setup-powersploit.sh --uninstall
+  ```
+2. Finalising Removal
+After running an uninstaller, you must reload your shell configuration to clear the aliases from your current session:
+```bash
+source ~/.bashrc
+```
+### SELinux & Permissions
+If you encounter Permission Denied when accessing host files:
+
+    The :Z Flag: The scripts automatically detect if SELinux is Enforcing and append the :Z label to volume mounts. If you move the aliases to a different machine, ensure this flag is present in the podman run command.
 ## License
 This container includes PowerSploit, which is licensed under the **BSD 3-Clause** License.
 The Dockerfile and build scripts are licensed under the **MIT License**:

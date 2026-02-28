@@ -48,7 +48,7 @@ Note: Because the container runs as root by default, files redirected into a fil
 
 ## Features
 - **Engine Agnostic:** Automatically detects and uses podman or docker.
-- **SELinux Aware:** On Fedora/RHEL systems, the script detects if SELinux is Enforcing and automatically appends the :Z flag to volume mounts to prevent "Permission Denied" errors.
+- **SELinux Aware:** On Fedora/RHEL systems, the script detects if SELinux is Enforcing and automatically appends the :Z flag to volume mountbash s to prevent "Permission Denied" errors.
 - **Volume Mounting:** Your current working directory is mapped to /data inside the container.
 - **User Mapping::wq** Uses --user $(id -u):$(id -g) so that files received or modified by netcat are owned by your host user, not root.
 
@@ -57,6 +57,23 @@ Note: Because the container runs as root by default, files redirected into a fil
 - Binary: Explicitly targets /usr/bin/nc.openbsd.
 - Networking: Uses --network host so the containerized tool behaves as if it were installed natively on your Fedora host.
 - Storage: Uses -v "$(pwd):/data" to bridge your current directory into the container environment.
+
+## Maintenance & Uninstallation
+Each setup script (setup-nc.sh) now includes a built-in uninstaller to keep your host environment clean.
+1. Uninstalling a Toolbox
+To remove a specific toolbox, its associated container image, and its aliases from your ~/.bashrc, run the original setup script with the --uninstall flag:
+  ```bash
+  bash setup-nc.sh --uninstall
+  ```
+2. Finalising Removal
+After running an uninstaller, you must reload your shell configuration to clear the aliases from your current session:
+```bash
+source ~/.bashrc
+```
+### SELinux & Permissions
+If you encounter Permission Denied when accessing host files:
+
+    The :Z Flag: The scripts automatically detect if SELinux is Enforcing and append the :Z label to volume mounts. If you move the aliases to a different machine, ensure this flag is present in the podman run command.
 
 ## License
 You can find the License file in the LICENSES folder in the repo.
