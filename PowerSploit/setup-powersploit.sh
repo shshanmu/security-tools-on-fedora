@@ -7,6 +7,15 @@ DOCKERFILE_NAME="Dockerfile.powersploit"
 if command -v podman >/dev/null 2>&1; then ENGINE="podman"; else ENGINE="docker"; fi
 SELINUX_FLAG=""; if [ "$(getenforce 2>/dev/null)" = "Enforcing" ]; then SELINUX_FLAG=":Z"; fi
 
+# --- UNINSTALL LOGIC ---
+if [[ "$1" == "--uninstall" ]]; then
+    echo "🗑️  Uninstalling PowerSploit Toolbox..."
+    sed -i "/# --- PowerSploit Core/,/alias powersploit-bsd/d" ~/.bashrc
+    $ENGINE rmi $IMAGE_NAME
+    echo "✅ Aliases removed and image deleted. Run 'source ~/.bashrc' to finalize."
+    exit 0
+fi
+
 # 2. Build Dockerfile
 cat <<EOF > $DOCKERFILE_NAME
 FROM kalilinux/kali-rolling

@@ -4,6 +4,16 @@
 IMAGE_NAME="kali-nc-bsd"
 DOCKERFILE_NAME="Dockerfile.nc_bsd"
 
+
+# --- UNINSTALL LOGIC ---
+if [[ "$1" == "--uninstall" ]]; then
+    echo "🗑️  Uninstalling Netcat-OpenBSD Toolbox..."
+    sed -i "/# --- Netcat-OpenBSD/,/alias netcat-bsd/d" ~/.bashrc
+    $ENGINE rmi $IMAGE_NAME
+    echo "✅ Aliases removed and image deleted. Run 'source ~/.bashrc' to finalize."
+    exit 0
+fi
+
 echo "🚀 Starting setup for netcat-openbsd (Kali-based)..."
 
 # 2. Container Engine Check (Podman vs Docker)
